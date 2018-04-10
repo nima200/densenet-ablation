@@ -83,6 +83,7 @@ try:
                   validation_data=(testX, Y_test), validation_steps=testX.shape[0] // batch_size, verbose=2)
 except KeyboardInterrupt:
     print("Training interrupted")
+    sys.exit(1)
 
 
 yPreds = model.predict(testX)
