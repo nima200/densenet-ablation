@@ -26,7 +26,11 @@ nb_dense_block = 3
 growth_rate = 12
 nb_filter = -1
 dropout_rate = 0.0 # 0.0 for data augmentation
-augment = sys.argv[1]
+if len(sys.argv) > 1:
+    augment = sys.argv[1]
+else:
+    augment = 'false'
+
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                           growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
 print("Model created")
