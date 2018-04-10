@@ -1,4 +1,4 @@
-import src.net as net
+import src.original.net as net
 from keras.datasets import cifar10
 from keras.utils import to_categorical
 

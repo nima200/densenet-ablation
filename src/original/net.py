@@ -1,12 +1,12 @@
 from keras.models import Model
-from keras.layers import Input, merge, ZeroPadding2D, concatenate
+from keras.layers import Input, ZeroPadding2D, concatenate
 from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import AveragePooling2D, GlobalAveragePooling2D, MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 import keras.backend as K
 
-from src.custom_layers import Scale
+from src.original.custom_layers import Scale
 
 
 def DenseNet(nb_dense_block=4, growth_rate=32, nb_filter=64, reduction=0.0, dropout_rate=0.0, weight_decay=1e-4,
