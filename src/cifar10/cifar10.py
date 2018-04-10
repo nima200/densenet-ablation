@@ -71,12 +71,14 @@ model_checkpoint= ModelCheckpoint(weights_file, monitor="val_acc", save_best_onl
 callbacks=[lr_reducer, model_checkpoint]
 try:
     if augment:
+        print("Training with data augmentation...")
         model.fit_generator(generator.flow(trainX, Y_train, batch_size=batch_size),
                             steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
                             callbacks=callbacks,
                             validation_data=(testX, Y_test),
                             validation_steps=testX.shape[0] // batch_size, verbose=1)
     else:
+        print("Training without data augmentation...")
         model.fit(trainX, Y_train, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks,
                   validation_data=(testX, Y_test), validation_steps=testX.shape[0] // batch_size, verbose=2)
 except KeyboardInterrupt:
