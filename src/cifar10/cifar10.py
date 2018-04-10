@@ -84,8 +84,7 @@ try:
     else:
         print("Training without data augmentation...")
         model.fit(trainX, Y_train, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks,
-                  steps_per_epoch=len(trainX), validation_data=(testX, Y_test),
-                  validation_steps=testX.shape[0] // batch_size, verbose=2)
+                  validation_data=(testX, Y_test), verbose=2)
 except KeyboardInterrupt:
     print("Training interrupted")
     sys.exit(1)
