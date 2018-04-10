@@ -26,7 +26,7 @@ nb_dense_block = 3
 growth_rate = 12
 nb_filter = -1
 dropout_rate = 0.0 # 0.0 for data augmentation
-augment = sys.argv[0]
+augment = sys.argv[1]
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                           growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
 print("Model created")
@@ -70,7 +70,7 @@ model_checkpoint= ModelCheckpoint(weights_file, monitor="val_acc", save_best_onl
 
 callbacks=[lr_reducer, model_checkpoint]
 try:
-    if augment:
+    if augment == 'true':
         print("Training with data augmentation...")
         model.fit_generator(generator.flow(trainX, Y_train, batch_size=batch_size),
                             steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
