@@ -1,8 +1,8 @@
 from __future__ import print_function
 
 import os.path
-
-import src.cifar10.densenet as densenet
+import sys
+import densenet
 import numpy as np
 import sklearn.metrics as metrics
 
@@ -26,7 +26,7 @@ nb_dense_block = 3
 growth_rate = 12
 nb_filter = -1
 dropout_rate = 0.0 # 0.0 for data augmentation
-
+augment = sys.argv[0]
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                           growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
 print("Model created")
@@ -69,15 +69,19 @@ model_checkpoint= ModelCheckpoint(weights_file, monitor="val_acc", save_best_onl
                                   save_weights_only=True, verbose=1)
 
 callbacks=[lr_reducer, model_checkpoint]
-
 try:
-    model.fit_generator(generator.flow(trainX, Y_train, batch_size=batch_size),
-                    steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
-                    callbacks=callbacks,
-                    validation_data=(testX, Y_test),
-                    validation_steps=testX.shape[0] // batch_size, verbose=1)
+    if augment:
+        model.fit_generator(generator.flow(trainX, Y_train, batch_size=batch_size),
+                            steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
+                            callbacks=callbacks,
+                            validation_data=(testX, Y_test),
+                            validation_steps=testX.shape[0] // batch_size, verbose=1)
+    else:
+        model.fit(trainX, Y_train, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks,
+                  validation_data=(testX, Y_test), validation_steps=testX.shape[0] // batch_size, verbose=2)
 except KeyboardInterrupt:
     print("Training interrupted")
+
 
 yPreds = model.predict(testX)
 yPred = np.argmax(yPreds, axis=1)
