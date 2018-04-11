@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import os.path
 import sys
-from BNLGrowthRate import densenet
+import densenet
 import numpy as np
 import sklearn.metrics as metrics
 
