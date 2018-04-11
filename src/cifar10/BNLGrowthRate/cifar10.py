@@ -90,7 +90,7 @@ lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
                                cooldown=0, patience=5, min_lr=1e-5, verbose=1)
 model_checkpoint_2k = ModelCheckpoint(weights_file_2k, monitor="val_acc", save_best_only=True,
                                       save_weights_only=True, verbose=1)
-tensorboard_2k = TensorBoard(log_dir=tb_dir_2k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=True,
+tensorboard_2k = TensorBoard(log_dir=tb_dir_2k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=False,
                              write_images=True, write_grads=True)
 
 callbacks_2k = [lr_reducer, model_checkpoint_2k, tensorboard_2k]
@@ -141,7 +141,7 @@ lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
 model_checkpoint_4k = ModelCheckpoint(weights_file_4k, monitor="val_acc", save_best_only=True,
                                       save_weights_only=True, verbose=1)
 
-tensorboard_4k = TensorBoard(log_dir=tb_dir_4k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=True,
+tensorboard_4k = TensorBoard(log_dir=tb_dir_4k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=False,
                              write_images=True, write_grads=True)
 
 callbacks_4k = [lr_reducer, model_checkpoint_4k, tensorboard_4k]
@@ -190,7 +190,7 @@ tb_dir_6k = "tensorboard/6k"
 model_checkpoint_6k = ModelCheckpoint(weights_file_6k, monitor="val_acc", save_best_only=True,
                                       save_weights_only=True, verbose=1)
 
-tensorboard_6k = TensorBoard(log_dir=tb_dir_6k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=True,
+tensorboard_6k = TensorBoard(log_dir=tb_dir_6k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=False,
                              write_images=True, write_grads=True)
 
 callbacks_6k = [lr_reducer, model_checkpoint_6k, tensorboard_6k]
@@ -239,7 +239,7 @@ model_checkpoint_8k = ModelCheckpoint(weights_file_8k, monitor="val_acc", save_b
                                       save_weights_only=True, verbose=1)
 
 
-tensorboard_8k = TensorBoard(log_dir=tb_dir_8k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=True,
+tensorboard_8k = TensorBoard(log_dir=tb_dir_8k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=False,
                              write_images=True, write_grads=True)
 
 callbacks_8k = [lr_reducer, model_checkpoint_8k, tensorboard_8k]
