@@ -15,7 +15,7 @@ from keras import backend as K
 
 batch_size = 100
 nb_classes = 10
-nb_epoch = 300
+nb_epoch = 40
 
 img_rows, img_cols = 32, 32
 img_channels = 3
@@ -56,17 +56,6 @@ model2k = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_b
                             growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
                             bottleneck=True, growth_rate_factor=2)
 
-model4k = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
-                            growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
-                            bottleneck=True, growth_rate_factor=4)
-
-model6k = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
-                            growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
-                            bottleneck=True, growth_rate_factor=6)
-
-model8k = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
-                            growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
-                            bottleneck=True, growth_rate_factor=8)
 print("Models created")
 
 # 2K MODEL
@@ -90,10 +79,10 @@ lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
                                cooldown=0, patience=5, min_lr=1e-5, verbose=1)
 model_checkpoint_2k = ModelCheckpoint(weights_file_2k, monitor="val_acc", save_best_only=True,
                                       save_weights_only=True, verbose=1)
-tensorboard_2k = TensorBoard(log_dir=tb_dir_2k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=True,
-                             write_images=True, write_grads=True)
+# tensorboard_2k = TensorBoard(log_dir=tb_dir_2k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=False,
+#                              write_images=True, write_grads=True)
 
-callbacks_2k = [lr_reducer, model_checkpoint_2k, tensorboard_2k]
+callbacks_2k = [lr_reducer, model_checkpoint_2k]
 try:
     if augment == 'true':
         print("Training with data augmentation...")
@@ -118,8 +107,12 @@ accuracy_2k = metrics.accuracy_score(yTrue, yPred_2k) * 100
 error_2k = 100 - accuracy_2k
 print("2K Accuracy : ", accuracy_2k)
 print("2K Error : ", error_2k)
+del model2k
 
 # 4K MODEL
+model4k = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
+                            growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
+                            bottleneck=True, growth_rate_factor=4)
 print("Building model 4k...")
 model4k.summary()
 optimizer = Adam(lr=1e-3)  # Using Adam instead of SGD to speed up training
@@ -141,10 +134,10 @@ lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
 model_checkpoint_4k = ModelCheckpoint(weights_file_4k, monitor="val_acc", save_best_only=True,
                                       save_weights_only=True, verbose=1)
 
-tensorboard_4k = TensorBoard(log_dir=tb_dir_4k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=True,
-                             write_images=True, write_grads=True)
+# tensorboard_4k = TensorBoard(log_dir=tb_dir_4k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=False,
+#                              write_images=True, write_grads=True)
 
-callbacks_4k = [lr_reducer, model_checkpoint_4k, tensorboard_4k]
+callbacks_4k = [lr_reducer, model_checkpoint_4k]
 try:
     if augment == 'true':
         print("Training with data augmentation...")
@@ -169,9 +162,14 @@ accuracy_4k = metrics.accuracy_score(yTrue, yPred_4k) * 100
 error_4k = 100 - accuracy_4k
 print("4K Accuracy : ", accuracy_4k)
 print("4K Error : ", error_4k)
+del model4k
 
 # 6K MODEL
 print("Building model 6k...")
+
+model6k = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
+                            growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
+                            bottleneck=True, growth_rate_factor=6)
 
 model6k.summary()
 optimizer = Adam(lr=1e-3)  # Using Adam instead of SGD to speed up training
@@ -190,10 +188,10 @@ tb_dir_6k = "tensorboard/6k"
 model_checkpoint_6k = ModelCheckpoint(weights_file_6k, monitor="val_acc", save_best_only=True,
                                       save_weights_only=True, verbose=1)
 
-tensorboard_6k = TensorBoard(log_dir=tb_dir_6k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=True,
-                             write_images=True, write_grads=True)
+# tensorboard_6k = TensorBoard(log_dir=tb_dir_6k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=False,
+#                              write_images=True, write_grads=True)
 
-callbacks_6k = [lr_reducer, model_checkpoint_6k, tensorboard_6k]
+callbacks_6k = [lr_reducer, model_checkpoint_6k]
 try:
     if augment == 'true':
         print("Training with data augmentation...")
@@ -217,9 +215,14 @@ accuracy_6k = metrics.accuracy_score(yTrue, yPred_6k) * 100
 error_6k = 100 - accuracy_6k
 print("6K Accuracy : ", accuracy_6k)
 print("6K Error : ", error_6k)
+del model6k
 
 # 8K MODEL
 print("Building model 8k...")
+
+model8k = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
+                            growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
+                            bottleneck=True, growth_rate_factor=8)
 
 model8k.summary()
 optimizer = Adam(lr=1e-3)  # Using Adam instead of SGD to speed up training
@@ -239,10 +242,10 @@ model_checkpoint_8k = ModelCheckpoint(weights_file_8k, monitor="val_acc", save_b
                                       save_weights_only=True, verbose=1)
 
 
-tensorboard_8k = TensorBoard(log_dir=tb_dir_8k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=True,
-                             write_images=True, write_grads=True)
+# tensorboard_8k = TensorBoard(log_dir=tb_dir_8k+"/logs", histogram_freq=5, batch_size=batch_size, write_graph=False,
+#                              write_images=True, write_grads=True)
 
-callbacks_8k = [lr_reducer, model_checkpoint_8k, tensorboard_8k]
+callbacks_8k = [lr_reducer, model_checkpoint_8k]
 try:
     if augment == 'true':
         print("Training with data augmentation...")
@@ -267,3 +270,4 @@ accuracy_8k = metrics.accuracy_score(yTrue, yPred_8k) * 100
 error_8k = 100 - accuracy_8k
 print("8K Accuracy : ", accuracy_8k)
 print("8K Error : ", error_8k)
+del model8k
