@@ -90,7 +90,7 @@ try:
                               steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
                               callbacks=callbacks_2k,
                               validation_data=(testX, Y_test),
-                              validation_steps=testX.shape[0] // batch_size, verbose=0)
+                              validation_steps=testX.shape[0] // batch_size, verbose=1)
     else:
         print("Training without data augmentation...")
         model2k.fit(trainX, Y_train, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks_2k,
@@ -145,7 +145,7 @@ try:
                               steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
                               callbacks=callbacks_4k,
                               validation_data=(testX, Y_test),
-                              validation_steps=testX.shape[0] // batch_size, verbose=0)
+                              validation_steps=testX.shape[0] // batch_size, verbose=1)
     else:
         print("Training without data augmentation...")
         model4k.fit(trainX, Y_train, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks_4k,
@@ -199,7 +199,7 @@ try:
                               steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
                               callbacks=callbacks_6k,
                               validation_data=(testX, Y_test),
-                              validation_steps=testX.shape[0] // batch_size, verbose=0)
+                              validation_steps=testX.shape[0] // batch_size, verbose=1)
     else:
         print("Training without data augmentation...")
         model6k.fit(trainX, Y_train, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks_6k,
@@ -253,7 +253,7 @@ try:
                               steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
                               callbacks=callbacks_8k,
                               validation_data=(testX, Y_test),
-                              validation_steps=testX.shape[0] // batch_size, verbose=0)
+                              validation_steps=testX.shape[0] // batch_size, verbose=1)
     else:
         print("Training without data augmentation...")
         model8k.fit(trainX, Y_train, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks_8k,
