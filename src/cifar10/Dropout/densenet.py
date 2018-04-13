@@ -76,7 +76,7 @@ def preprocess_input(x, data_format=None):
 def DenseNet(input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1, nb_layers_per_block=-1,
              bottleneck=False, reduction=0.0, dropout_rate=0.0, weight_decay=1e-4, subsample_initial_block=False,
              include_top=True, weights=None, input_tensor=None,
-             classes=10, activation='softmax'):
+             classes=10, activation='softmax', concatenation_dropout=None):
     '''Instantiate the DenseNet architecture,
         optionally loading weights pre-trained
         on CIFAR-10. Note that when using TensorFlow,
@@ -160,7 +160,8 @@ def DenseNet(input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_fi
 
     x = __create_dense_net(classes, img_input, include_top, depth, nb_dense_block,
                            growth_rate, nb_filter, nb_layers_per_block, bottleneck, reduction,
-                           dropout_rate, weight_decay, subsample_initial_block, activation)
+                           dropout_rate, weight_decay, subsample_initial_block, activation,
+                           concatenation_dropout=concatenation_dropout)
 
     # Ensure that the model takes into account
     # any potential predecessors of `input_tensor`.
@@ -476,7 +477,7 @@ def __conv_block(ip, nb_filter, bottleneck=False, dropout_rate=None, weight_deca
 
 
 def __dense_block(x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropout_rate=None, weight_decay=1e-4,
-                  grow_nb_filters=True, return_concat_list=False):
+                  grow_nb_filters=True, return_concat_list=False, concatenation_dropout=None):
     ''' Build a dense_block where the output of each conv_block is fed to subsequent ones
     Args:
         x: keras tensor
@@ -499,6 +500,8 @@ def __dense_block(x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropou
         x_list.append(cb)
 
         x = concatenate([x, cb], axis=concat_axis)
+        if concatenation_dropout:
+            x = Dropout(rate=concatenation_dropout)(x)
 
         if grow_nb_filters:
             nb_filter += growth_rate
@@ -558,7 +561,7 @@ def __transition_up_block(ip, nb_filters, type='deconv', weight_decay=1E-4):
 
 def __create_dense_net(nb_classes, img_input, include_top, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1,
                        nb_layers_per_block=-1, bottleneck=False, reduction=0.0, dropout_rate=None, weight_decay=1e-4,
-                       subsample_initial_block=False, activation='softmax'):
+                       subsample_initial_block=False, activation='softmax', concatenation_dropout=None):
     ''' Build the DenseNet model
     Args:
         nb_classes: number of classes
@@ -639,14 +642,16 @@ def __create_dense_net(nb_classes, img_input, include_top, depth=40, nb_dense_bl
     # Add dense blocks
     for block_idx in range(nb_dense_block - 1):
         x, nb_filter = __dense_block(x, nb_layers[block_idx], nb_filter, growth_rate, bottleneck=bottleneck,
-                                     dropout_rate=dropout_rate, weight_decay=weight_decay)
+                                     dropout_rate=dropout_rate, weight_decay=weight_decay,
+                                     concatenation_dropout=concatenation_dropout)
         # add transition_block
         x = __transition_block(x, nb_filter, compression=compression, weight_decay=weight_decay)
         nb_filter = int(nb_filter * compression)
 
     # The last dense_block does not have a transition_block
     x, nb_filter = __dense_block(x, final_nb_layer, nb_filter, growth_rate, bottleneck=bottleneck,
-                                 dropout_rate=dropout_rate, weight_decay=weight_decay)
+                                 dropout_rate=dropout_rate, weight_decay=weight_decay,
+                                 concatenation_dropout=concatenation_dropout)
 
     x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
     x = Activation('relu')(x)
