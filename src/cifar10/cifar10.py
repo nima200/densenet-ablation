@@ -10,7 +10,7 @@ from keras.datasets import cifar10
 from keras.utils import np_utils
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 from keras import backend as K
 
 batch_size = 100
@@ -72,7 +72,9 @@ lr_reducer      = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
 model_checkpoint= ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
                                   save_weights_only=True, verbose=1)
 
-callbacks=[lr_reducer, model_checkpoint]
+csv = CSVLogger("Densenet-40-12-CIFAR10.csv", separator=',')
+
+callbacks=[lr_reducer, model_checkpoint, csv]
 try:
     if augment == 'true':
         print("Training with data augmentation...")
