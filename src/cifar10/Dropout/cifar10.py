@@ -15,7 +15,7 @@ from keras import backend as K
 
 batch_size = 100
 nb_classes = 10
-nb_epoch = 40
+nb_epoch = 100
 
 img_rows, img_cols = 32, 32
 img_channels = 3
@@ -33,7 +33,7 @@ else:
 
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                           growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
-                          concatenation_dropout=0.3)
+                          concatenation_dropout=0.15)
 print("Model created")
 
 model.summary()
