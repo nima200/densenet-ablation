@@ -13,7 +13,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 from keras import backend as K
 
-batch_size = 50
+batch_size = 100 
 nb_classes = 10
 nb_epoch = 40
 
@@ -24,7 +24,7 @@ img_dim = (img_channels, img_rows, img_cols) if K.image_dim_ordering() == "th" e
 depth = 40
 
 
-nb_dense_block = [1, 2, 3, 4, 6, 9]
+nb_dense_block = [1, 2, 3, 4, 6]
 growth_rate = 12
 nb_filter = -1
 dropout_rate = 0.0 # 0.0 for data augmentation
