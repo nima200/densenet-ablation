@@ -65,7 +65,7 @@ for nb_db in nb_dense_block:
     generator.fit(trainX, seed=0)
 
     # Load model
-    weights_file = "weights/DenseNet-40-12-CIFAR10-%d_blocks.h5" % nb_db
+    weights_file = "weights/DenseNet-40-12-SVHN-%d_blocks.h5" % nb_db
     if os.path.exists(weights_file):
         # model.load_weights(weights_file, by_name=True)
         print("Model loaded.")
@@ -77,7 +77,7 @@ for nb_db in nb_dense_block:
     model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
                                        save_weights_only=True, verbose=1)
 
-    csv = CSVLogger("Densenet-40-12-CIFAR10-%d_blocks.csv" % nb_db, separator=',')
+    csv = CSVLogger("Densenet-40-12-SVHN-%d_blocks.csv" % nb_db, separator=',')
 
     callbacks = [lr_reducer, model_checkpoint, csv]
     try:
