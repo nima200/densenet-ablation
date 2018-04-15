@@ -54,6 +54,7 @@ for nb_db in nb_dense_block:
     trainX = densenet.preprocess_input(trainX)
     trainX = np.reshape(trainX, (trainX.shape[0], trainX.shape[1], trainX.shape[2], img_channels))
     testX = densenet.preprocess_input(testX)
+    testX = np.reshape(testX, (testX.shape[0], testX.shape[1], testX.shape[2], img_channels))
 
     Y_train = np_utils.to_categorical(trainY, nb_classes)
     Y_test = np_utils.to_categorical(testY, nb_classes)
