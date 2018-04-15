@@ -21,10 +21,10 @@ img_rows, img_cols = 28, 28
 img_channels = 1
 
 img_dim = (img_channels, img_rows, img_cols) if K.image_dim_ordering() == "th" else (img_rows, img_cols, img_channels)
-depth = 100
+depth = 40
 
 
-nb_dense_block = [1, 2, 3, 4, 6]
+nb_dense_block = [2, 3, 4, 6]
 growth_rate = 12
 nb_filter = -1
 dropout_rate = 0.0 # 0.0 for data augmentation
