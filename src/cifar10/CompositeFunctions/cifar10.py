@@ -57,8 +57,11 @@ generator.fit(trainX, seed=0)
 
 lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=1e-5)
 
-for x in [0, 1, 2, 3, 4, 5]:
-    model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
+for order in [0, 1, 2, 3, 4, 5]:
+
+    print("Order: ", order)
+
+    model = densenet.DenseNet(order, img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                               growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
     print("Model created")
 
@@ -69,7 +72,7 @@ for x in [0, 1, 2, 3, 4, 5]:
     print("Building model...")
 
     # Load model
-    weights_file = "weights/DenseNet-40-12-CIFAR10-composite-" + str(x) + ".h5"
+    weights_file = "weights/DenseNet-40-12-CIFAR10-composite-" + str(order) + ".h5"
 
     if os.path.exists(weights_file) and load_models:
         model.load_weights(weights_file, by_name=True)
@@ -80,7 +83,7 @@ for x in [0, 1, 2, 3, 4, 5]:
     model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True, save_weights_only=True,
                                        verbose=1)
 
-    log_file = "Densenet-40-12-CIFAR10-composite-" + str(x) + ".csv"
+    log_file = "Densenet-40-12-CIFAR10-composite-" + str(order) + ".csv"
     csv = CSVLogger(log_file, separator=',')
 
     callbacks = [lr_reducer, model_checkpoint, csv]

@@ -65,7 +65,7 @@ def preprocess_input(x, data_format=None):
     return x
 
 
-def DenseNet(input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1, nb_layers_per_block=-1,
+def DenseNet(order, input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1, nb_layers_per_block=-1,
              bottleneck=False, reduction=0.0, dropout_rate=0.0, weight_decay=1e-4, subsample_initial_block=False,
              include_top=True, weights=None, input_tensor=None,
              classes=10, activation='softmax'):
@@ -146,7 +146,7 @@ def DenseNet(input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_fi
         else:
             img_input = input_tensor
 
-    x = __create_dense_net(classes, img_input, include_top, depth, nb_dense_block,
+    x = __create_dense_net(order, classes, img_input, include_top, depth, nb_dense_block,
                            growth_rate, nb_filter, nb_layers_per_block, bottleneck, reduction,
                            dropout_rate, weight_decay, subsample_initial_block, activation)
 
@@ -162,7 +162,7 @@ def DenseNet(input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_fi
     return model_
 
 
-def __conv_block(ip, nb_filter, order, bottleneck=True, dropout_rate=None, weight_decay=1e-4):
+def __conv_block(order, ip, nb_filter, bottleneck=True, dropout_rate=None, weight_decay=1e-4):
     """ Apply BatchNorm, Relu, 3x3 Conv2D, optional bottleneck block and dropout
     Args:
         ip: Input keras tensor
@@ -173,7 +173,7 @@ def __conv_block(ip, nb_filter, order, bottleneck=True, dropout_rate=None, weigh
     Returns: keras tensor with batch_norm, relu and convolution2d added (optional bottleneck)
     """
     concat_axis = 1 if K.image_data_format() == 'channels_first' else -1
-    x = getattr(sys.modules[__name__], "'order_'%s" % str(order))(ip, concat_axis, nb_filter, weight_decay)
+    x = getattr(sys.modules[__name__], "order_%s" % str(order))(ip, concat_axis, nb_filter, weight_decay)
     return x
 
 
@@ -318,7 +318,7 @@ def order_5(ip, concat_axis, nb_filter, weight_decay):
     return x
 
 
-def __dense_block(x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropout_rate=None, weight_decay=1e-4,
+def __dense_block(order, x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropout_rate=None, weight_decay=1e-4,
                   grow_nb_filters=True, return_concat_list=False):
     ''' Build a dense_block where the output of each conv_block is fed to subsequent ones
     Args:
@@ -338,7 +338,7 @@ def __dense_block(x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropou
     x_list = [x]
 
     for i in range(nb_layers):
-        cb = __conv_block(x, growth_rate, bottleneck, dropout_rate, weight_decay)
+        cb = __conv_block(order, x, growth_rate, bottleneck, dropout_rate, weight_decay)
         x_list.append(cb)
 
         x = concatenate([x, cb], axis=concat_axis)
@@ -399,7 +399,7 @@ def __transition_up_block(ip, nb_filters, type='deconv', weight_decay=1E-4):
     return x
 
 
-def __create_dense_net(nb_classes, img_input, include_top, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1,
+def __create_dense_net(order, nb_classes, img_input, include_top, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1,
                        nb_layers_per_block=-1, bottleneck=False, reduction=0.0, dropout_rate=None, weight_decay=1e-4,
                        subsample_initial_block=False, activation='softmax'):
     ''' Build the DenseNet model
@@ -481,14 +481,14 @@ def __create_dense_net(nb_classes, img_input, include_top, depth=40, nb_dense_bl
 
     # Add dense blocks
     for block_idx in range(nb_dense_block - 1):
-        x, nb_filter = __dense_block(x, nb_layers[block_idx], nb_filter, growth_rate, bottleneck=bottleneck,
+        x, nb_filter = __dense_block(order, x, nb_layers[block_idx], nb_filter, growth_rate, bottleneck=bottleneck,
                                      dropout_rate=dropout_rate, weight_decay=weight_decay)
         # add transition_block
         x = __transition_block(x, nb_filter, compression=compression, weight_decay=weight_decay)
         nb_filter = int(nb_filter * compression)
 
     # The last dense_block does not have a transition_block
-    x, nb_filter = __dense_block(x, final_nb_layer, nb_filter, growth_rate, bottleneck=bottleneck,
+    x, nb_filter = __dense_block(order, x, final_nb_layer, nb_filter, growth_rate, bottleneck=bottleneck,
                                  dropout_rate=dropout_rate, weight_decay=weight_decay)
 
     x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
