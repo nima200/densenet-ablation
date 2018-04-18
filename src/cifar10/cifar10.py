@@ -25,18 +25,24 @@ depth = 40
 nb_dense_block = 3
 growth_rate = 12
 nb_filter = -1
-dropout_rate = 0.0 # 0.0 for data augmentation
+dropout_rate = 0.0  # 0.0 for data augmentation
+
 if len(sys.argv) > 1:
     augment = sys.argv[1]
 else:
     augment = 'false'
+
+load_models = False
+if len(sys.argv) > 2:
+    assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
+    load_models = True
 
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                           growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
 print("Model created")
 
 model.summary()
-optimizer = Adam(lr=1e-3) # Using Adam instead of SGD to speed up training
+optimizer = Adam(lr=1e-3)  # Using Adam instead of SGD to speed up training
 model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=["accuracy"])
 print("Finished compiling")
 print("Building model...")
@@ -53,28 +59,28 @@ Y_train = np_utils.to_categorical(trainY, nb_classes)
 Y_test = np_utils.to_categorical(testY, nb_classes)
 
 generator = ImageDataGenerator(rotation_range=15,
-                               width_shift_range=5./32,
-                               height_shift_range=5./32,
+                               width_shift_range=5. / 32,
+                               height_shift_range=5. / 32,
                                horizontal_flip=True)
 
 generator.fit(trainX, seed=0)
 
 # Load model
-weights_file="weights/DenseNet-40-12-CIFAR10.h5"
+weights_file = "weights/DenseNet-40-12-CIFAR10.h5"
 if os.path.exists(weights_file):
-    #model.load_weights(weights_file, by_name=True)
+    # model.load_weights(weights_file, by_name=True)
     print("Model loaded.")
 
-out_dir="weights/"
+out_dir = "weights/"
 
-lr_reducer      = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
-                                    cooldown=0, patience=5, min_lr=1e-5)
-model_checkpoint= ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
-                                  save_weights_only=True, verbose=1)
+lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
+                               cooldown=0, patience=5, min_lr=1e-5)
+model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
+                                   save_weights_only=True, verbose=1)
 
 csv = CSVLogger("Densenet-40-12-CIFAR10.csv", separator=',')
 
-callbacks=[lr_reducer, model_checkpoint, csv]
+callbacks = [lr_reducer, model_checkpoint, csv]
 try:
     if augment == 'true':
         print("Training with data augmentation...")
@@ -90,7 +96,6 @@ try:
 except KeyboardInterrupt:
     print("Training interrupted")
     sys.exit(1)
-
 
 yPreds = model.predict(testX)
 yPred = np.argmax(yPreds, axis=1)
