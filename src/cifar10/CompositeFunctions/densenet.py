@@ -10,8 +10,8 @@ from __future__ import division
 import sys
 
 from keras.models import Model
-from keras.layers.core import Dense, Dropout, Activation
-from keras.layers.convolutional import Conv2D, Conv2DTranspose, UpSampling2D
+from keras.layers.core import Dense, Activation
+from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import AveragePooling2D, MaxPooling2D
 from keras.layers.pooling import GlobalAveragePooling2D
 from keras.layers import Input
