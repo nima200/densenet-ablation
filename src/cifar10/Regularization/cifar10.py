@@ -5,6 +5,7 @@ import sys
 import densenet
 import numpy as np
 import sklearn.metrics as metrics
+from random import shuffle
 
 from keras.datasets import cifar10
 from keras.utils import np_utils
@@ -42,7 +43,7 @@ model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_blo
                           growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
 print("Model created")
 
-model.summary()
+# model.summary()
 optimizer = Adam(lr=1e-3)  # Using Adam instead of SGD to speed up training
 model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=["accuracy"])
 print("Finished compiling")
@@ -64,7 +65,15 @@ generator = ImageDataGenerator(rotation_range=15,
                                height_shift_range=5. / 32,
                                horizontal_flip=True)
 
-generator.fit(trainX, seed=0)
+# Here we zip the data and its classes so they get moved around together
+train = zip(trainX, trainY)
+
+# Then we sort the zipped list by its classes
+train = sorted(train, key=lambda x: x[1])
+
+# Then we turn each class into it's categorical representation
+train = list(map((lambda d: (d[0], np_utils.to_categorical(d[1], nb_classes)[0])), train))
+
 
 # Load model
 weights_file = "weights/DenseNet-40-12-CIFAR10.h5"
@@ -77,33 +86,51 @@ out_dir = "weights/"
 
 lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
                                cooldown=0, patience=5, min_lr=1e-5)
+
 model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
                                    save_weights_only=True, verbose=1)
 
 csv = CSVLogger("Densenet-40-12-CIFAR10.csv", separator=',')
 
 callbacks = [lr_reducer, model_checkpoint, csv]
-try:
-    if augment == 'true':
-        print("Training with data augmentation...")
-        model.fit_generator(generator.flow(trainX, Y_train, batch_size=batch_size),
-                            steps_per_epoch=len(trainX) // batch_size, epochs=nb_epoch,
-                            callbacks=callbacks,
-                            validation_data=(testX, Y_test),
-                            validation_steps=testX.shape[0] // batch_size, verbose=1)
+
+for data_size in [100, 500, 1000, 5000, 10000, 25000, 50000]:
+    training_data = []
+
+    if data_size == 50000:
+        training_data = train
     else:
-        print("Training without data augmentation...")
-        model.fit(trainX, Y_train, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks,
-                  validation_data=(testX, Y_test), verbose=2)
-except KeyboardInterrupt:
-    print("Training interrupted")
-    sys.exit(1)
+        for x in range(0, 50000, 500):
+            training_data = training_data + train[x: x + int(data_size/10)]
 
-yPreds = model.predict(testX)
-yPred = np.argmax(yPreds, axis=1)
-yTrue = testY
+    shuffle(training_data)
+    x, y = map(list, zip(*training_data))
+    x = np.asarray(x, dtype=np.float32)
+    y = np.asarray(y, dtype=np.int32)
 
-accuracy = metrics.accuracy_score(yTrue, yPred) * 100
-error = 100 - accuracy
-print("Accuracy : ", accuracy)
-print("Error : ", error)
+    generator.fit(x, seed=0)
+
+    try:
+        if augment == 'true':
+            print("Training with data augmentation...")
+            model.fit_generator(generator.flow(x, y, batch_size=batch_size),
+                                steps_per_epoch=len(x) // batch_size, epochs=nb_epoch,
+                                callbacks=callbacks,
+                                validation_data=(testX, Y_test),
+                                validation_steps=testX.shape[0] // batch_size, verbose=1)
+        else:
+            print("Training without data augmentation...")
+            model.fit(x, y, batch_size=batch_size, epochs=nb_epoch, callbacks=callbacks,
+                      validation_data=(testX, Y_test), verbose=2)
+    except KeyboardInterrupt:
+        print("Training interrupted")
+        sys.exit(1)
+
+    yPreds = model.predict(testX)
+    yPred = np.argmax(yPreds, axis=1)
+    yTrue = testY
+
+    accuracy = metrics.accuracy_score(yTrue, yPred) * 100
+    error = 100 - accuracy
+    print("Accuracy : ", accuracy)
+    print("Error : ", error)

@@ -6,7 +6,7 @@ import densenet
 import numpy as np
 import sklearn.metrics as metrics
 
-from keras.datasets import cifar10
+from keras.datasets import fashion_mnist
 from keras.utils import np_utils
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
@@ -17,8 +17,8 @@ batch_size = 100
 nb_classes = 10
 nb_epoch = 40
 
-img_rows, img_cols = 32, 32
-img_channels = 3
+img_rows, img_cols = 28, 28
+img_channels = 1
 
 img_dim = (img_channels, img_rows, img_cols) if K.image_dim_ordering() == "th" else (img_rows, img_cols, img_channels)
 depth = 40
@@ -48,20 +48,21 @@ model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=["ac
 print("Finished compiling")
 print("Building model...")
 
-(trainX, trainY), (testX, testY) = cifar10.load_data()
+(trainX, trainY), (testX, testY) = fashion_mnist.load_data()
+
 
 trainX = trainX.astype('float32')
-testX = testX.astype('float32')
+trainX = np.reshape(trainX, [60000, 28, 28, 1])
 
-trainX = densenet.preprocess_input(trainX)
-testX = densenet.preprocess_input(testX)
+testX = testX.astype('float32')
+testX = np.reshape(testX, [10000, 28, 28, 1])
 
 Y_train = np_utils.to_categorical(trainY, nb_classes)
 Y_test = np_utils.to_categorical(testY, nb_classes)
 
 generator = ImageDataGenerator(rotation_range=15,
-                               width_shift_range=5. / 32,
-                               height_shift_range=5. / 32,
+                               width_shift_range=5. / 28,
+                               height_shift_range=5. / 28,
                                horizontal_flip=True)
 
 generator.fit(trainX, seed=0)
