@@ -35,6 +35,7 @@ else:
 load_models = False
 if len(sys.argv) > 2:
     assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
+    print("Loading models from file")
     load_models = True
 
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
@@ -67,8 +68,9 @@ generator.fit(trainX, seed=0)
 
 # Load model
 weights_file = "weights/DenseNet-40-12-CIFAR10.h5"
-if os.path.exists(weights_file):
-    # model.load_weights(weights_file, by_name=True)
+
+if os.path.exists(weights_file) and load_models:
+    model.load_weights(weights_file, by_name=True)
     print("Model loaded.")
 
 out_dir = "weights/"
