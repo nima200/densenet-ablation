@@ -13,6 +13,8 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 from keras import backend as K
 
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
 
 batch_size = 100
 nb_classes = 10
