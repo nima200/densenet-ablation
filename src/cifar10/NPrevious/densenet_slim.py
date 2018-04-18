@@ -139,7 +139,10 @@ def __dense_block(x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropou
         if use_all_previous:
             x = concatenate([x, cb], axis=concat_axis)
         else:
-            x = concatenate(x_list[-(nb_previous_used):], axis=concat_axis);
+            if nb_previous_used == 1:
+                x = x_list[-1]
+            else:
+                x = concatenate(x_list[-(nb_previous_used):], axis=concat_axis);
 
         if grow_nb_filters:
             nb_filter += growth_rate
@@ -243,5 +246,5 @@ def __create_dense_net(nb_classes, img_input, include_top, depth=40, nb_dense_bl
 if __name__ == '__main__':
     model = DenseNet((32, 32, 3), depth=40, nb_dense_block=3,
                      growth_rate=12, bottleneck=True, reduction=0.5, weights=None,
-                    use_all_previous=False, nb_previous_used=5)
+                    use_all_previous=False, nb_previous_used=1)
     model.summary()
