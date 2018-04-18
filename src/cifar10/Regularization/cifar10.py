@@ -34,6 +34,9 @@ growth_rate = 12
 nb_filter = -1
 dropout_rate = 0.0  # 0.0 for data augmentation
 
+if not os.path.exists("weights"):
+    os.makedirs("weights")
+
 if len(sys.argv) > 1:
     augment = sys.argv[1]
 else:

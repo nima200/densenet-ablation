@@ -19,6 +19,9 @@ sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
+if not os.path.exists("weights"):
+    os.makedirs("weights")
+
 batch_size = 100
 nb_classes = 10
 nb_epoch = 40
