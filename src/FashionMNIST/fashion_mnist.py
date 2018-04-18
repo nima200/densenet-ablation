@@ -33,13 +33,13 @@ dropout_rate = 0.0  # 0.0 for data augmentation
 if len(sys.argv) > 1:
     augment = sys.argv[1]
 else:
-    augment = 'false'
+    augment = 'true'
 
 load_models = False
-if len(sys.argv) > 2:
-    assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
-    print("Loading models from file")
-    load_models = True
+# if len(sys.argv) > 2:
+#     assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
+#     print("Loading models from file")
+#     load_models = True
 
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                           growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)

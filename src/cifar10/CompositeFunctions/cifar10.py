@@ -33,12 +33,12 @@ dropout_rate = 0.0  # 0.0 for data augmentation
 if len(sys.argv) > 1:
     augment = sys.argv[1]
 else:
-    augment = 'false'
+    augment = 'true'
 
 load_models = False
-if len(sys.argv) > 2:
-    assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
-    load_models = True
+# if len(sys.argv) > 2:
+#     assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
+#     load_models = True
 
 (trainX, trainY), (testX, testY) = cifar10.load_data()
 
