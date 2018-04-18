@@ -96,8 +96,12 @@ callbacks = [lr_reducer, model_checkpoint, csv]
 
 for data_size in [100, 500, 1000, 5000, 10000, 25000, 50000]:
     training_data = []
-    for x in range(0, 50000, 500):
-        training_data = training_data + train[x: x + int(data_size/10)]
+
+    if data_size == 50000:
+        training_data = train
+    else:
+        for x in range(0, 50000, 500):
+            training_data = training_data + train[x: x + int(data_size/10)]
 
     shuffle(training_data)
     x, y = map(list, zip(*training_data))
