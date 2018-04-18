@@ -70,7 +70,7 @@ def DenseNet(input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_fi
 
     # Determine proper input shape
     input_shape = _obtain_input_shape(input_shape,
-                                      default_size=32,
+                                      default_size=28,
                                       min_size=8,
                                       data_format=K.image_data_format(),
                                       require_flatten=include_top)
@@ -230,6 +230,6 @@ def __create_dense_net(nb_classes, img_input, include_top, depth=40, nb_dense_bl
 
 
 if __name__ == '__main__':
-    model = DenseNet((32, 32, 3), depth=100, nb_dense_block=3,
+    model = DenseNet((28, 28, 1), depth=100, nb_dense_block=3,
                      growth_rate=12, bottleneck=True, reduction=0.5, weights=None)
     model.summary()
