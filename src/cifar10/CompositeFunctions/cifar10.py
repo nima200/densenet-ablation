@@ -12,8 +12,13 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, CSVLogger
 from keras import backend as K
+import tensorflow as tf
+# Creates a session with log_device_placement set to True.
+sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 
 from tensorflow.python.client import device_lib
+
+
 print(device_lib.list_local_devices())
 
 batch_size = 100
