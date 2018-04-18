@@ -4,5 +4,5 @@
 source activate base
 
 # Install dependencies from requirements
-pip3 install -r requirements.txt
-conda install -r requirements.txt
+pip install -r requirements.txt
+conda install --yes --file requirements.txt
