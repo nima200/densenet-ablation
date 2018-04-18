@@ -318,6 +318,28 @@ def order_5(ip, concat_axis, nb_filter, weight_decay):
     return x
 
 
+#  Activation -> Conv
+def order_6(ip, concat_axis, nb_filter, weight_decay):
+    x = Activation('relu')(ip)
+
+    """
+    Bottleneck
+    ================================================
+    """
+    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
+
+    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
+               kernel_regularizer=l2(weight_decay))(x)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    x = Activation('relu')(x)
+
+    """
+    ================================================
+    """
+    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
+    return x
+
+
 def __dense_block(order, x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropout_rate=None, weight_decay=1e-4,
                   grow_nb_filters=True, return_concat_list=False):
     ''' Build a dense_block where the output of each conv_block is fed to subsequent ones

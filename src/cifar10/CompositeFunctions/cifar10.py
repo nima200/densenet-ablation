@@ -57,7 +57,7 @@ generator.fit(trainX, seed=0)
 
 lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=1e-5)
 
-for order in [0, 1, 2, 3, 4, 5]:
+for order in range(0, 7):
 
     print("Order: ", order)
 
