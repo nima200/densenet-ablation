@@ -74,20 +74,21 @@ generator = ImageDataGenerator(rotation_range=15,
 generator.fit(trainX, seed=0)
 
 # Load model
-weights_file = "weights/DenseNet-40-12-CIFAR10.h5"
+weights_file = "weights/DenseNet-40-12-FashionMNIST.h5"
 
 if os.path.exists(weights_file) and load_models:
     model.load_weights(weights_file, by_name=True)
     print("Model loaded.")
 
-out_dir = "weights/"
+if not os.path.exists(weights_file):
+    file = open(weights_file, 'w')
 
 lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
                                cooldown=0, patience=5, min_lr=1e-5)
 model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
                                    save_weights_only=True, verbose=1)
 
-csv = CSVLogger("Densenet-40-12-CIFAR10.csv", separator=',')
+csv = CSVLogger("DenseNet-40-12-FashionMNIST.csv", separator=',')
 
 callbacks = [lr_reducer, model_checkpoint, csv]
 try:

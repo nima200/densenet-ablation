@@ -80,18 +80,19 @@ for order in range(0, 7):
     print("Building model...")
 
     # Load model
-    weights_file = "weights/DenseNet-40-12-CIFAR10-composite-" + str(order) + ".h5"
+    weights_file = "weights/DenseNet-40-12-CIFAR10-composite-%s.h5" % str(order)
 
     if os.path.exists(weights_file) and load_models:
         model.load_weights(weights_file, by_name=True)
         print("Model loaded.")
 
-    out_dir = "weights/"
+    if not os.path.exists(weights_file):
+        file = open(weights_file, 'w')
 
     model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True, save_weights_only=True,
                                        verbose=1)
 
-    log_file = "Densenet-40-12-CIFAR10-composite-" + str(order) + ".csv"
+    log_file = "Densenet-40-12-CIFAR10-composite-%s.csv" % str(order)
     csv = CSVLogger(log_file, separator=',')
 
     callbacks = [lr_reducer, model_checkpoint, csv]
