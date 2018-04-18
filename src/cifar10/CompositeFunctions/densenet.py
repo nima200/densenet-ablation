@@ -7,6 +7,8 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
+import sys
+
 from keras.models import Model
 from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.convolutional import Conv2D, Conv2DTranspose, UpSampling2D
@@ -160,7 +162,7 @@ def DenseNet(input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_fi
     return model_
 
 
-def __conv_block(ip, nb_filter, bottleneck=False, dropout_rate=None, weight_decay=1e-4):
+def __conv_block(ip, nb_filter, order, bottleneck=True, dropout_rate=None, weight_decay=1e-4):
     """ Apply BatchNorm, Relu, 3x3 Conv2D, optional bottleneck block and dropout
     Args:
         ip: Input keras tensor
@@ -171,27 +173,148 @@ def __conv_block(ip, nb_filter, bottleneck=False, dropout_rate=None, weight_deca
     Returns: keras tensor with batch_norm, relu and convolution2d added (optional bottleneck)
     """
     concat_axis = 1 if K.image_data_format() == 'channels_first' else -1
-
-    """
-    ================================================
-    HERE IS WHERE THE COMPOSITE FUNCTION TAKES PLACE
-    ================================================
-    """
+    x = getattr(sys.modules[__name__], "'order_'%s" % str(order))(ip, concat_axis, nb_filter, weight_decay)
+    return x
 
 
+# Normal ordering of composite function
+def order_0(ip, concat_axis, nb_filter, weight_decay):
     x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(ip)
     x = Activation('relu')(x)
 
-    if bottleneck:
-        inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
+    """
+    Bottleneck
+    ================================================
+    """
+    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
 
-        x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
-                   kernel_regularizer=l2(weight_decay))(x)
-        x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-        x = Activation('relu')(x)
+    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
+               kernel_regularizer=l2(weight_decay))(x)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    x = Activation('relu')(x)
+
+    """
+    ================================================
+    """
+
+    return Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
+
+
+# Batch -> Conv -> Activation
+def order_1(ip, concat_axis, nb_filter, weight_decay):
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(ip)
+
+    """
+    Bottleneck
+    ================================================
+    """
+    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
+
+    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
+               kernel_regularizer=l2(weight_decay))(x)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    x = Activation('relu')(x)
+
+    """
+    ================================================
+    """
 
     x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
+    x = Activation('relu')(x)
+    return x
 
+
+#  Conv -> Batch -> Activation
+def order_2(ip, concat_axis, nb_filter, weight_decay):
+    """
+    Bottleneck
+    ================================================
+    """
+    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
+
+    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
+               kernel_regularizer=l2(weight_decay))(ip)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    x = Activation('relu')(x)
+
+    """
+    ================================================
+    """
+
+    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    x = Activation('relu')(x)
+    return x
+
+
+#  Conv ->  Activation -> Batch
+def order_3(ip, concat_axis, nb_filter, weight_decay):
+    """
+    Bottleneck
+    ================================================
+    """
+    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
+
+    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
+               kernel_regularizer=l2(weight_decay))(ip)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    x = Activation('relu')(x)
+
+    """
+    ================================================
+    """
+
+    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
+    x = Activation('relu')(x)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    return x
+
+
+#  Activation -> Conv ->  Batch
+def order_4(ip, concat_axis, nb_filter, weight_decay):
+
+    x = Activation('relu')(ip)
+
+    """
+    Bottleneck
+    ================================================
+    """
+    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
+
+    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
+               kernel_regularizer=l2(weight_decay))(x)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    x = Activation('relu')(x)
+
+    """
+    ================================================
+    """
+
+    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    return x
+
+
+#  Activation -> Batch -> Conv
+def order_5(ip, concat_axis, nb_filter, weight_decay):
+    x = Activation('relu')(ip)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+
+    """
+    Bottleneck
+    ================================================
+    """
+    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
+
+    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
+               kernel_regularizer=l2(weight_decay))(x)
+    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    x = Activation('relu')(x)
+
+    """
+    ================================================
+    """
+    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
     return x
 
 
