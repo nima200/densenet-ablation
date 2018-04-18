@@ -1,17 +1,15 @@
-'''DenseNet models for Keras.
+"""DenseNet models for Keras.
 # Reference
 - [Densely Connected Convolutional Networks](https://arxiv.org/pdf/1608.06993.pdf)
-- [The One Hundred Layers Tiramisu: Fully Convolutional DenseNets for Semantic Segmentation](https://arxiv.org/pdf/1611.09326.pdf)
-'''
+"""
+
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
-import sys
-
 from keras.models import Model
 from keras.layers.core import Dense, Dropout, Activation
-from keras.layers.convolutional import Conv2D, Conv2DTranspose, UpSampling2D
+from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import AveragePooling2D, MaxPooling2D
 from keras.layers.pooling import GlobalAveragePooling2D
 from keras.layers import Input
@@ -24,7 +22,6 @@ import keras.backend as K
 
 
 def preprocess_input(x, data_format=None):
-
     if data_format is None:
         data_format = K.image_data_format()
     assert data_format in {'channels_last', 'channels_first'}
@@ -55,7 +52,7 @@ def preprocess_input(x, data_format=None):
     return x
 
 
-def DenseNet(order, input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1, nb_layers_per_block=-1,
+def DenseNet(input_shape=None, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1, nb_layers_per_block=-1,
              bottleneck=False, reduction=0.0, dropout_rate=0.0, weight_decay=1e-4, subsample_initial_block=False,
              include_top=True, weights=None, input_tensor=None,
              classes=10, activation='softmax'):
@@ -86,7 +83,7 @@ def DenseNet(order, input_shape=None, depth=40, nb_dense_block=3, growth_rate=12
         else:
             img_input = input_tensor
 
-    x = __create_dense_net(order, classes, img_input, include_top, depth, nb_dense_block,
+    x = __create_dense_net(classes, img_input, include_top, depth, nb_dense_block,
                            growth_rate, nb_filter, nb_layers_per_block, bottleneck, reduction,
                            dropout_rate, weight_decay, subsample_initial_block, activation)
 
@@ -99,187 +96,39 @@ def DenseNet(order, input_shape=None, depth=40, nb_dense_block=3, growth_rate=12
 
     # Create model.
     model_ = Model(inputs, x, name='densenet')
+
     return model_
 
 
-def __conv_block(order, ip, nb_filter, bottleneck=True, dropout_rate=None, weight_decay=1e-4):
+def __conv_block(ip, nb_filter, bottleneck=False, dropout_rate=None, weight_decay=1e-4):
     concat_axis = 1 if K.image_data_format() == 'channels_first' else -1
-    x = getattr(sys.modules[__name__], "order_%s" % str(order))(ip, concat_axis, nb_filter, weight_decay)
-    return x
 
-
-# Normal ordering of composite function
-def order_0(ip, concat_axis, nb_filter, weight_decay):
     x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(ip)
     x = Activation('relu')(x)
 
-    """
-    Bottleneck
-    ================================================
-    """
-    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
+    if bottleneck:
+        inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
 
-    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
-               kernel_regularizer=l2(weight_decay))(x)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    x = Activation('relu')(x)
-
-    """
-    ================================================
-    """
-
-    return Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
-
-
-# Batch -> Conv -> Activation
-def order_1(ip, concat_axis, nb_filter, weight_decay):
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(ip)
-
-    """
-    Bottleneck
-    ================================================
-    """
-    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
-
-    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
-               kernel_regularizer=l2(weight_decay))(x)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    x = Activation('relu')(x)
-
-    """
-    ================================================
-    """
+        x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
+                   kernel_regularizer=l2(weight_decay))(x)
+        x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+        x = Activation('relu')(x)
 
     x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
-    x = Activation('relu')(x)
+    if dropout_rate:
+        x = Dropout(dropout_rate)(x)
+
     return x
 
 
-#  Conv -> Batch -> Activation
-def order_2(ip, concat_axis, nb_filter, weight_decay):
-    """
-    Bottleneck
-    ================================================
-    """
-    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
-
-    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
-               kernel_regularizer=l2(weight_decay))(ip)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    x = Activation('relu')(x)
-
-    """
-    ================================================
-    """
-
-    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    x = Activation('relu')(x)
-    return x
-
-
-#  Conv ->  Activation -> Batch
-def order_3(ip, concat_axis, nb_filter, weight_decay):
-    """
-    Bottleneck
-    ================================================
-    """
-    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
-
-    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
-               kernel_regularizer=l2(weight_decay))(ip)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    x = Activation('relu')(x)
-
-    """
-    ================================================
-    """
-
-    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
-    x = Activation('relu')(x)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    return x
-
-
-#  Activation -> Conv ->  Batch
-def order_4(ip, concat_axis, nb_filter, weight_decay):
-
-    x = Activation('relu')(ip)
-
-    """
-    Bottleneck
-    ================================================
-    """
-    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
-
-    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
-               kernel_regularizer=l2(weight_decay))(x)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    x = Activation('relu')(x)
-
-    """
-    ================================================
-    """
-
-    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    return x
-
-
-#  Activation -> Batch -> Conv
-def order_5(ip, concat_axis, nb_filter, weight_decay):
-    x = Activation('relu')(ip)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-
-    """
-    Bottleneck
-    ================================================
-    """
-    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
-
-    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
-               kernel_regularizer=l2(weight_decay))(x)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    x = Activation('relu')(x)
-
-    """
-    ================================================
-    """
-    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
-    return x
-
-
-#  Activation -> Conv
-def order_6(ip, concat_axis, nb_filter, weight_decay):
-    x = Activation('relu')(ip)
-
-    """
-    Bottleneck
-    ================================================
-    """
-    inter_channel = nb_filter * 4  # Obtained from https://github.com/liuzhuang13/DenseNet/blob/master/densenet.lua
-
-    x = Conv2D(inter_channel, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
-               kernel_regularizer=l2(weight_decay))(x)
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
-    x = Activation('relu')(x)
-
-    """
-    ================================================
-    """
-    x = Conv2D(nb_filter, (3, 3), kernel_initializer='he_normal', padding='same', use_bias=False)(x)
-    return x
-
-
-def __dense_block(order, x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropout_rate=None, weight_decay=1e-4,
+def __dense_block(x, nb_layers, nb_filter, growth_rate, bottleneck=False, dropout_rate=None, weight_decay=1e-4,
                   grow_nb_filters=True, return_concat_list=False):
-
     concat_axis = 1 if K.image_data_format() == 'channels_first' else -1
 
     x_list = [x]
 
     for i in range(nb_layers):
-        cb = __conv_block(order, x, growth_rate, bottleneck, dropout_rate, weight_decay)
+        cb = __conv_block(x, growth_rate, bottleneck, dropout_rate, weight_decay)
         x_list.append(cb)
 
         x = concatenate([x, cb], axis=concat_axis)
@@ -294,7 +143,6 @@ def __dense_block(order, x, nb_layers, nb_filter, growth_rate, bottleneck=False,
 
 
 def __transition_block(ip, nb_filter, compression=1.0, weight_decay=1e-4):
-
     concat_axis = 1 if K.image_data_format() == 'channels_first' else -1
 
     x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(ip)
@@ -306,21 +154,19 @@ def __transition_block(ip, nb_filter, compression=1.0, weight_decay=1e-4):
     return x
 
 
-def __create_dense_net(order, nb_classes, img_input, include_top, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1,
+def __create_dense_net(nb_classes, img_input, include_top, depth=40, nb_dense_block=3, growth_rate=12, nb_filter=-1,
                        nb_layers_per_block=-1, bottleneck=False, reduction=0.0, dropout_rate=None, weight_decay=1e-4,
                        subsample_initial_block=False, activation='softmax'):
-
-
     concat_axis = 1 if K.image_data_format() == 'channels_first' else -1
 
     if reduction != 0.0:
-        assert reduction <= 1.0 and reduction > 0.0, 'reduction value must lie between 0.0 and 1.0'
+        assert 1.0 >= reduction > 0.0, 'reduction value must lie between 0.0 and 1.0'
 
     # layers in each dense block
     if type(nb_layers_per_block) is list or type(nb_layers_per_block) is tuple:
         nb_layers = list(nb_layers_per_block)  # Convert tuple to list
 
-        assert len(nb_layers) == (nb_dense_block), 'If list, nb_layer is used as provided. ' \
+        assert len(nb_layers) == nb_dense_block, 'If list, nb_layer is used as provided. ' \
                                                    'Note that list size must be (nb_dense_block)'
         final_nb_layer = nb_layers[-1]
         nb_layers = nb_layers[:-1]
@@ -363,14 +209,14 @@ def __create_dense_net(order, nb_classes, img_input, include_top, depth=40, nb_d
 
     # Add dense blocks
     for block_idx in range(nb_dense_block - 1):
-        x, nb_filter = __dense_block(order, x, nb_layers[block_idx], nb_filter, growth_rate, bottleneck=bottleneck,
+        x, nb_filter = __dense_block(x, nb_layers[block_idx], nb_filter, growth_rate, bottleneck=bottleneck,
                                      dropout_rate=dropout_rate, weight_decay=weight_decay)
         # add transition_block
         x = __transition_block(x, nb_filter, compression=compression, weight_decay=weight_decay)
         nb_filter = int(nb_filter * compression)
 
     # The last dense_block does not have a transition_block
-    x, nb_filter = __dense_block(order, x, final_nb_layer, nb_filter, growth_rate, bottleneck=bottleneck,
+    x, nb_filter = __dense_block(x, final_nb_layer, nb_filter, growth_rate, bottleneck=bottleneck,
                                  dropout_rate=dropout_rate, weight_decay=weight_decay)
 
     x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
