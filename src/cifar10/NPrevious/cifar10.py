@@ -29,7 +29,7 @@ dropout_rate = 0.0  # 0.0 for data augmentation
 
 bottleneck = False
 
-for nb_previous_used in range(1,6):
+for nb_previous_used in range(1,7):
 
     model_name = "DenseNet-40-12-CIFAR10-nbPrev="+str(nb_previous_used)
 
