@@ -66,13 +66,13 @@ generator = ImageDataGenerator(rotation_range=15,
 
 generator.fit(trainX, seed=0)
 
+
 # Load model
 weights_file = "weights/DenseNet-40-12-CIFAR10-%s.h5" % bottleneck
+
 if os.path.exists(weights_file):
     # model.load_weights(weights_file, by_name=True)
     print("Model loaded.")
-
-out_dir = "weights/"
 
 lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
                                cooldown=0, patience=5, min_lr=1e-5)
