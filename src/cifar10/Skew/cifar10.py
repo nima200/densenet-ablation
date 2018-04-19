@@ -29,7 +29,7 @@ dropout_rate = 0.0  # 0.0 for data augmentation
 
 bottleneck = True
 
-for growth_skewness in [-3,-2,-1,0,1,2,3]:
+for growth_skewness in [-3,-2,-1,1,2,3]:
 
 
     model_name = "DenseNet-40-12-CIFAR10-skew="+str(growth_skewness)
