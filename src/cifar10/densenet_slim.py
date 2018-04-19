@@ -230,6 +230,24 @@ def __create_dense_net(nb_classes, img_input, include_top, depth=40, nb_dense_bl
 
 
 if __name__ == '__main__':
-    model = DenseNet((32, 32, 3), depth=100, nb_dense_block=3,
-                     growth_rate=12, bottleneck=True, reduction=0.5, weights=None)
+
+    batch_size = 100
+    nb_classes = 10
+    nb_epoch = 40
+
+    img_rows, img_cols = 32, 32
+    img_channels = 3
+
+    img_dim = (img_channels, img_rows, img_cols) if K.image_dim_ordering() == "th" else (img_rows, img_cols, img_channels)
+    depth = 40
+    nb_dense_block = 3
+    growth_rate = 12
+    nb_filter = -1
+    dropout_rate = 0.0  # 0.0 for data augmentation
+
+    bottleneck = True
+
+    model = DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
+                              growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
+                              bottleneck=bottleneck)
     model.summary()

@@ -27,10 +27,16 @@ growth_rate = 12
 nb_filter = -1
 dropout_rate = 0.0  # 0.0 for data augmentation
 
+bottleneck = True
+
+
+model_name = "DenseNet-40-12-CIFAR10"
+
+
 if len(sys.argv) > 1:
     augment = sys.argv[1]
 else:
-    augment = 'false'
+    augment = 'true'
 
 load_models = False
 if len(sys.argv) > 2:
@@ -38,8 +44,9 @@ if len(sys.argv) > 2:
     load_models = True
 
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
-                          growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
-print("Model created")
+                          growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
+                          bottleneck=bottleneck)
+print("Model "+model_name+" created")
 
 model.summary()
 optimizer = Adam(lr=1e-3)  # Using Adam instead of SGD to speed up training
@@ -66,10 +73,10 @@ generator = ImageDataGenerator(rotation_range=15,
 generator.fit(trainX, seed=0)
 
 # Load model
-weights_file = "weights/DenseNet-40-12-CIFAR10.h5"
+weights_file = "weights/"+model_name
 if os.path.exists(weights_file):
     # model.load_weights(weights_file, by_name=True)
-    print("Model loaded.")
+    print("Model "+model_name+" loaded.")
 
 out_dir = "weights/"
 
@@ -78,7 +85,7 @@ lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
 model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
                                    save_weights_only=True, verbose=1)
 
-csv = CSVLogger("Densenet-40-12-CIFAR10.csv", separator=',')
+csv = CSVLogger(model_name+".csv", separator=',')
 
 callbacks = [lr_reducer, model_checkpoint, csv]
 try:
