@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import os.path
 import sys
-import densenet
+import densenet_slim as densenet
 import numpy as np
 import sklearn.metrics as metrics
 
@@ -45,7 +45,7 @@ for growth_skewness in [-3,-2,-1,1,2,3]:
         assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
         load_models = True
 
-    model = DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
+    model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                               growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
                               bottleneck=bottleneck, growth_skewness=growth_skewness)
     print("Model "+model_name+" created")
