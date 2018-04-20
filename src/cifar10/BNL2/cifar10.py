@@ -36,7 +36,7 @@ model_name = "DenseNet-40-12-CIFAR10-bottleneck=False-nb3x3=6"
 if len(sys.argv) > 1:
     augment = sys.argv[1]
 else:
-    augment = 'true'
+    augment = 'false'
 
 load_models = False
 if len(sys.argv) > 2:
