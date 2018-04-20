@@ -43,14 +43,10 @@ else:
     augment = 'true'
 
 load_models = False
-# if len(sys.argv) > 2:
-#     assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
-#     print("Loading models from file")
-#     load_models = True
 
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
                           growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
-                          bottleneck=True)
+                          bottleneck=False)
 print("Model created")
 
 # model.summary()
@@ -90,7 +86,7 @@ lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
 for data_size in [100, 1000, 10000, 50000]:
 
     # Load model
-    weights_file = "weights/DenseNet-40-12-CIFAR10-%s.h5" % str(data_size)
+    weights_file = "weights/DenseNet-40-12-CIFAR10-%s-bottleneck=%s.h5" % (str(data_size), "False")
 
     if os.path.exists(weights_file) and load_models:
         model.load_weights(weights_file, by_name=True)
@@ -102,7 +98,7 @@ for data_size in [100, 1000, 10000, 50000]:
     model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True,
                                        save_weights_only=True, verbose=1)
 
-    csv = CSVLogger("Densenet-40-12-CIFAR10-Size-%s.csv" % str(data_size), separator=',')
+    csv = CSVLogger("Densenet-40-12-CIFAR10-Size-%s-%s.csv" % (str(data_size), "False"), separator=',')
 
     callbacks = [lr_reducer, model_checkpoint, csv]
 
