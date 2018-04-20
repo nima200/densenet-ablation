@@ -25,7 +25,7 @@ print(device_lib.list_local_devices())
 
 batch_size = 100
 nb_classes = 10
-nb_epoch = 14
+nb_epoch = 40
 
 img_rows, img_cols = 32, 32
 img_channels = 3
@@ -42,7 +42,7 @@ if len(sys.argv) > 1:
 else:
     augment = 'true'
 
-load_models = True
+load_models = False
 # if len(sys.argv) > 2:
 #     assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
 #     load_models = True
@@ -88,9 +88,6 @@ for order in range(5, 6):
     if os.path.exists(weights_file) and load_models:
         model.load_weights(weights_file, by_name=True)
         print("Model loaded.")
-
-    if not os.path.exists(weights_file):
-        file = open(weights_file, 'w')
 
     model_checkpoint = ModelCheckpoint(weights_file, monitor="val_acc", save_best_only=True, save_weights_only=True,
                                        verbose=1)
