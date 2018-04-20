@@ -4,7 +4,7 @@
 source activate base
 
 # Run Composite Function Permutations
-python3 cifar10/CompositeFunctions/cifar10.py 2>&1 | tee -a cifar10/CompositeFunctions/log
+#python3 cifar10/CompositeFunctions/cifar10.py 2>&1 | tee -a cifar10/CompositeFunctions/log
 
 # Run Regularization tests
 python3 cifar10/Regularization/cifar10.py 2>&1 | tee -a cifar10/Regularization/log
