@@ -25,7 +25,7 @@ print(device_lib.list_local_devices())
 
 batch_size = 100
 nb_classes = 10
-nb_epoch = 40
+nb_epoch = 14
 
 img_rows, img_cols = 32, 32
 img_channels = 3
