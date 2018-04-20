@@ -20,12 +20,12 @@ from tensorflow.python.client import device_lib
 
 print(device_lib.list_local_devices())
 
-if not os.path.exists("weights"):
-    os.makedirs("weights")
+# if not os.path.exists("weights"):
+#     os.makedirs("weights")
 
 batch_size = 100
 nb_classes = 10
-nb_epoch = 40
+nb_epoch = 14
 
 img_rows, img_cols = 32, 32
 img_channels = 3
@@ -42,7 +42,7 @@ if len(sys.argv) > 1:
 else:
     augment = 'true'
 
-load_models = False
+load_models = True
 # if len(sys.argv) > 2:
 #     assert sys.argv[2] == '--load_models', 'Unknown flag: ' + sys.argv[2]
 #     load_models = True
@@ -67,7 +67,8 @@ generator.fit(trainX, seed=0)
 
 lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=1e-5)
 
-for order in range(0, 7):
+# Changed to 5,6 to retest composite order #5!!
+for order in range(5, 6):
 
     print("Order: ", order)
 
