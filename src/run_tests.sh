@@ -8,13 +8,13 @@ source activate base
 
 mkdir cifar10/Dropout/weights cifar10/Dropout/log cifar10/Regularization/weights cifar10/Regularization/log FashionMNIST/weight FashionMNIST/log
 # Run Dropout tests
-python3 cifar10/Dropout/cifar10.py 2>&1 | tee -a cifar10/Dropout/log/dropout.log
+python3 cifar10/Dropout/cifar10.py 2>&1
 
 # Run Regularization tests
-python3 cifar10/Regularization/cifar10.py 2>&1 | tee -a cifar10/Regularization/log/regularization.log
+python3 cifar10/Regularization/cifar10.py 2>&1 
 
 #Run Fashion MNIST
-python3 FashionMNIST/fashion_mnist.py 2>&1 | tee -a FashionMNIST/log/fashionMNIST.log
+python3 FashionMNIST/fashion_mnist.py 2>&1 
 
 
 
