@@ -67,8 +67,7 @@ generator.fit(trainX, seed=0)
 
 lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=1e-5)
 
-# Changed to 5,6 to retest composite order #5!!
-for order in range(5, 6):
+for order in range(0, 6):
 
     print("Order: ", order)
 
