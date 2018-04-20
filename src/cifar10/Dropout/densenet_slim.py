@@ -109,8 +109,10 @@ def __conv_block(ip, nb_filter, original_nb_filter, bottleneck=False, dropout_ra
 
     if dropout_before and dropout_rate:
         x = Dropout(dropout_rate)(ip)
+        x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
+    else:
+        x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(ip)
 
-    x = BatchNormalization(axis=concat_axis, epsilon=1.1e-5)(x)
     x = Activation('relu')(x)
 
     if bottleneck:
