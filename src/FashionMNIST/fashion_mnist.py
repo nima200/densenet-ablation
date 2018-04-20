@@ -48,7 +48,8 @@ load_models = False
 #     load_models = True
 
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
-                          growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
+                          growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
+                          bottleneck=True)
 print("Model created")
 
 model.summary()
