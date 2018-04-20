@@ -49,7 +49,8 @@ load_models = False
 #     load_models = True
 
 model = densenet.DenseNet(img_dim, classes=nb_classes, depth=depth, nb_dense_block=nb_dense_block,
-                          growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
+                          growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None,
+                          bottleneck=True)
 print("Model created")
 
 # model.summary()
@@ -86,7 +87,7 @@ train = list(map((lambda d: (d[0], np_utils.to_categorical(d[1], nb_classes)[0])
 lr_reducer = ReduceLROnPlateau(monitor='val_acc', factor=np.sqrt(0.1),
                                cooldown=0, patience=5, min_lr=1e-5)
 
-for data_size in [100, 500, 1000, 5000, 10000, 25000, 50000]:
+for data_size in [100, 1000, 10000, 50000]:
 
     # Load model
     weights_file = "weights/DenseNet-40-12-CIFAR10-%s.h5" % str(data_size)
