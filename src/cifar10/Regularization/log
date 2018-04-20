@@ -1,0 +1,271 @@
+2018-04-18 18:18:13.061554: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+2018-04-18 18:18:35.385952: W tensorflow/core/framework/op_kernel.cc:1202] OP_REQUIRES failed at mkl_concat_op.cc:780 : Aborted: Operation received an exception:Status: 5, message: could not initialize a memory descriptor, in file tensorflow/core/kernels/mkl_concat_op.cc:777
+/home/jamesbrace/anaconda3/lib/python3.6/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+[name: "/device:CPU:0"
+device_type: "CPU"
+memory_limit: 268435456
+locality {
+}
+incarnation: 5763275793148628764
+]
+Model created
+Finished compiling
+Building model...
+Training with data augmentation...
+Epoch 1/40
+Traceback (most recent call last):
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/client/session.py", line 1361, in _do_call
+    return fn(*args)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/client/session.py", line 1340, in _run_fn
+    target_list, status, run_metadata)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/framework/errors_impl.py", line 516, in __exit__
+    c_api.TF_GetCode(self.status.status))
+tensorflow.python.framework.errors_impl.AbortedError: Operation received an exception:Status: 5, message: could not initialize a memory descriptor, in file tensorflow/core/kernels/mkl_concat_op.cc:777
+	 [[Node: concatenate_1/concat = _MklConcatV2[N=2, T=DT_FLOAT, Tidx=DT_INT32, _kernel="MklOp", _device="/job:localhost/replica:0/task:0/device:CPU:0"](conv2d_1/convolution, conv2d_2/convolution, concatenate_1/concat/axis, conv2d_1/convolution:2, conv2d_2/convolution:2, DMT/_13)]]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "cifar10/Regularization/cifar10.py", line 123, in <module>
+    validation_steps=testX.shape[0] // batch_size, verbose=1)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/legacy/interfaces.py", line 91, in wrapper
+    return func(*args, **kwargs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/engine/training.py", line 2224, in fit_generator
+    class_weight=class_weight)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/engine/training.py", line 1883, in train_on_batch
+    outputs = self.train_function(ins)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py", line 2478, in __call__
+    **self.session_kwargs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/client/session.py", line 905, in run
+    run_metadata_ptr)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/client/session.py", line 1137, in _run
+    feed_dict_tensor, options, run_metadata)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/client/session.py", line 1355, in _do_run
+    options, run_metadata)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/client/session.py", line 1374, in _do_call
+    raise type(e)(node_def, op, message)
+tensorflow.python.framework.errors_impl.AbortedError: Operation received an exception:Status: 5, message: could not initialize a memory descriptor, in file tensorflow/core/kernels/mkl_concat_op.cc:777
+	 [[Node: concatenate_1/concat = _MklConcatV2[N=2, T=DT_FLOAT, Tidx=DT_INT32, _kernel="MklOp", _device="/job:localhost/replica:0/task:0/device:CPU:0"](conv2d_1/convolution, conv2d_2/convolution, concatenate_1/concat/axis, conv2d_1/convolution:2, conv2d_2/convolution:2, DMT/_13)]]
+
+Caused by op 'concatenate_1/concat', defined at:
+  File "cifar10/Regularization/cifar10.py", line 46, in <module>
+    growth_rate=growth_rate, nb_filter=nb_filter, dropout_rate=dropout_rate, weights=None)
+  File "/home/jamesbrace/ml-ablation/src/cifar10/Regularization/densenet.py", line 88, in DenseNet
+    dropout_rate, weight_decay, subsample_initial_block, activation)
+  File "/home/jamesbrace/ml-ablation/src/cifar10/Regularization/densenet.py", line 213, in __create_dense_net
+    dropout_rate=dropout_rate, weight_decay=weight_decay)
+  File "/home/jamesbrace/ml-ablation/src/cifar10/Regularization/densenet.py", line 134, in __dense_block
+    x = concatenate([x, cb], axis=concat_axis)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/layers/merge.py", line 641, in concatenate
+    return Concatenate(axis=axis, **kwargs)(inputs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/engine/topology.py", line 619, in __call__
+    output = self.call(inputs, **kwargs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/layers/merge.py", line 155, in call
+    return self._merge_function(inputs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/layers/merge.py", line 357, in _merge_function
+    return K.concatenate(inputs, axis=self.axis)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/backend/tensorflow_backend.py", line 1881, in concatenate
+    return tf.concat([to_dense(x) for x in tensors], axis)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/ops/array_ops.py", line 1175, in concat
+    return gen_array_ops._concat_v2(values=values, axis=axis, name=name)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/ops/gen_array_ops.py", line 625, in _concat_v2
+    "ConcatV2", values=values, axis=axis, name=name)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py", line 787, in _apply_op_helper
+    op_def=op_def)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 3271, in create_op
+    op_def=op_def)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/tensorflow/python/framework/ops.py", line 1650, in __init__
+    self._traceback = self._graph._extract_stack()  # pylint: disable=protected-access
+
+AbortedError (see above for traceback): Operation received an exception:Status: 5, message: could not initialize a memory descriptor, in file tensorflow/core/kernels/mkl_concat_op.cc:777
+	 [[Node: concatenate_1/concat = _MklConcatV2[N=2, T=DT_FLOAT, Tidx=DT_INT32, _kernel="MklOp", _device="/job:localhost/replica:0/task:0/device:CPU:0"](conv2d_1/convolution, conv2d_2/convolution, concatenate_1/concat/axis, conv2d_1/convolution:2, conv2d_2/convolution:2, DMT/_13)]]
+
+Traceback (most recent call last):
+  File "cifar10/Regularization/cifar10.py", line 5, in <module>
+    import densenet
+  File "/home/jamesbrace/ml-ablation/src/cifar10/Regularization/densenet.py", line 10, in <module>
+    from keras.models import Model
+ModuleNotFoundError: No module named 'keras.models'
+2018-04-18 18:37:14.503278: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+2018-04-18 18:37:14.582417: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:892] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-04-18 18:37:14.582745: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Found device 0 with properties: 
+name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235
+pciBusID: 0000:00:04.0
+totalMemory: 11.17GiB freeMemory: 11.09GiB
+2018-04-18 18:37:14.582771: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+2018-04-18 18:37:14.782982: I tensorflow/core/common_runtime/direct_session.cc:299] Device mapping:
+/job:localhost/replica:0/task:0/device:GPU:0 -> device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7
+
+2018-04-18 18:37:14.783195: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+2018-04-18 18:37:14.822928: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+[name: "/device:CPU:0"
+device_type: "CPU"
+memory_limit: 268435456
+locality {
+}
+incarnation: 1550626558364910599
+, name: "/device:GPU:0"
+device_type: "GPU"
+memory_limit: 357171200
+locality {
+  bus_id: 1
+}
+incarnation: 9446126400580603173
+physical_device_desc: "device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7"
+]
+Model created
+Finished compiling
+Building model...
+Training with data augmentation...
+Epoch 1/40
+
+ 1/10 [==>...........................] - ETA: 1:03 - loss: 2.5076 - acc: 0.1000
+ 2/10 [=====>........................] - ETA: 31s - loss: 2.4421 - acc: 0.1400 
+ 3/10 [========>.....................] - ETA: 19s - loss: 2.4052 - acc: 0.1833
+ 4/10 [===========>..................] - ETA: 13s - loss: 2.3501 - acc: 0.2000
+ 5/10 [==============>...............] - ETA: 9s - loss: 2.3407 - acc: 0.2140 
+ 6/10 [=================>............] - ETA: 6s - loss: 2.3125 - acc: 0.2200
+ 7/10 [====================>.........] - ETA: 4s - loss: 2.2917 - acc: 0.2300
+ 8/10 [=======================>......] - ETA: 2s - loss: 2.2669 - acc: 0.2350
+ 9/10 [==========================>...] - ETA: 1s - loss: 2.2678 - acc: 0.2433
+10/10 [==============================] - 36s 4s/step - loss: 2.2636 - acc: 0.2420 - val_loss: 3.8478 - val_acc: 0.1630
+/home/jamesbrace/anaconda3/lib/python3.6/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+
+Epoch 00001: val_acc improved from -inf to 0.16300, saving model to weights/DenseNet-40-12-CIFAR10.h5
+Device mapping:
+/job:localhost/replica:0/task:0/device:GPU:0 -> device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7
+Traceback (most recent call last):
+  File "cifar10/Regularization/cifar10.py", line 126, in <module>
+    validation_steps=testX.shape[0] // batch_size, verbose=1)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/legacy/interfaces.py", line 91, in wrapper
+    return func(*args, **kwargs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/engine/training.py", line 2262, in fit_generator
+    callbacks.on_epoch_end(epoch, epoch_logs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/callbacks.py", line 77, in on_epoch_end
+    callback.on_epoch_end(epoch, logs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/callbacks.py", line 445, in on_epoch_end
+    self.model.save_weights(filepath, overwrite=True)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/engine/topology.py", line 2610, in save_weights
+    with h5py.File(filepath, 'w') as f:
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/h5py/_hl/files.py", line 269, in __init__
+    fid = make_fid(name, mode, userblock_size, fapl, swmr=swmr)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/h5py/_hl/files.py", line 105, in make_fid
+    fid = h5f.create(name, h5f.ACC_TRUNC, fapl=fapl, fcpl=fcpl)
+  File "h5py/_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py/h5f.pyx", line 98, in h5py.h5f.create
+OSError: Unable to create file (unable to open file: name = 'weights/DenseNet-40-12-CIFAR10.h5', errno = 2, error message = 'No such file or directory', flags = 13, o_flags = 242)
+2018-04-18 18:58:49.792571: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+2018-04-18 18:58:49.867504: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:892] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-04-18 18:58:49.867894: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Found device 0 with properties: 
+name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235
+pciBusID: 0000:00:04.0
+totalMemory: 11.17GiB freeMemory: 11.09GiB
+2018-04-18 18:58:49.867920: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+2018-04-18 18:58:50.070398: I tensorflow/core/common_runtime/direct_session.cc:299] Device mapping:
+/job:localhost/replica:0/task:0/device:GPU:0 -> device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7
+
+2018-04-18 18:58:50.070661: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+2018-04-18 18:58:50.108884: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+[name: "/device:CPU:0"
+device_type: "CPU"
+memory_limit: 268435456
+locality {
+}
+incarnation: 11763392050407520663
+, name: "/device:GPU:0"
+device_type: "GPU"
+memory_limit: 357171200
+locality {
+  bus_id: 1
+}
+incarnation: 7877113108319865744
+physical_device_desc: "device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7"
+]
+Model created
+Finished compiling
+Building model...
+Training with data augmentation...
+Epoch 1/40
+
+ 1/10 [==>...........................] - ETA: 1:03 - loss: 2.4593 - acc: 0.1200
+ 2/10 [=====>........................] - ETA: 31s - loss: 2.3602 - acc: 0.1650 
+ 3/10 [========>.....................] - ETA: 19s - loss: 2.4021 - acc: 0.1900
+ 4/10 [===========>..................] - ETA: 13s - loss: 2.3591 - acc: 0.2150
+ 5/10 [==============>...............] - ETA: 9s - loss: 2.3101 - acc: 0.2280 
+ 6/10 [=================>............] - ETA: 6s - loss: 2.3221 - acc: 0.2350
+ 7/10 [====================>.........] - ETA: 4s - loss: 2.2904 - acc: 0.2386
+ 8/10 [=======================>......] - ETA: 2s - loss: 2.2792 - acc: 0.2425
+ 9/10 [==========================>...] - ETA: 1s - loss: 2.2659 - acc: 0.2400
+10/10 [==============================] - 36s 4s/step - loss: 2.2594 - acc: 0.2340 - val_loss: 2.5146 - val_acc: 0.2386
+/home/jamesbrace/anaconda3/lib/python3.6/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+
+Epoch 00001: val_acc improved from -inf to 0.23860, saving model to weights/DenseNet-40-12-CIFAR10.h5
+Device mapping:
+/job:localhost/replica:0/task:0/device:GPU:0 -> device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7
+Traceback (most recent call last):
+  File "cifar10/Regularization/cifar10.py", line 126, in <module>
+    validation_steps=testX.shape[0] // batch_size, verbose=1)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/legacy/interfaces.py", line 91, in wrapper
+    return func(*args, **kwargs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/engine/training.py", line 2262, in fit_generator
+    callbacks.on_epoch_end(epoch, epoch_logs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/callbacks.py", line 77, in on_epoch_end
+    callback.on_epoch_end(epoch, logs)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/callbacks.py", line 445, in on_epoch_end
+    self.model.save_weights(filepath, overwrite=True)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/keras/engine/topology.py", line 2610, in save_weights
+    with h5py.File(filepath, 'w') as f:
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/h5py/_hl/files.py", line 269, in __init__
+    fid = make_fid(name, mode, userblock_size, fapl, swmr=swmr)
+  File "/home/jamesbrace/anaconda3/lib/python3.6/site-packages/h5py/_hl/files.py", line 105, in make_fid
+    fid = h5f.create(name, h5f.ACC_TRUNC, fapl=fapl, fcpl=fcpl)
+  File "h5py/_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py/_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py/h5f.pyx", line 98, in h5py.h5f.create
+OSError: Unable to create file (unable to open file: name = 'weights/DenseNet-40-12-CIFAR10.h5', errno = 2, error message = 'No such file or directory', flags = 13, o_flags = 242)
+2018-04-18 19:09:45.461776: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+2018-04-18 19:09:45.536276: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:892] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-04-18 19:09:45.536612: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Found device 0 with properties: 
+name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235
+pciBusID: 0000:00:04.0
+totalMemory: 11.17GiB freeMemory: 11.09GiB
+2018-04-18 19:09:45.536639: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+2018-04-18 19:09:45.738222: I tensorflow/core/common_runtime/direct_session.cc:299] Device mapping:
+/job:localhost/replica:0/task:0/device:GPU:0 -> device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7
+
+2018-04-18 19:09:45.738457: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+2018-04-18 19:09:45.778210: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1120] Creating TensorFlow device (/device:GPU:0) -> (device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7)
+/home/jamesbrace/anaconda3/lib/python3.6/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+[name: "/device:CPU:0"
+device_type: "CPU"
+memory_limit: 268435456
+locality {
+}
+incarnation: 16964305895537337433
+, name: "/device:GPU:0"
+device_type: "GPU"
+memory_limit: 357171200
+locality {
+  bus_id: 1
+}
+incarnation: 15438052900347281156
+physical_device_desc: "device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7"
+]
+Model created
+Finished compiling
+Building model...
+Device mapping:
+/job:localhost/replica:0/task:0/device:GPU:0 -> device: 0, name: Tesla K80, pci bus id: 0000:00:04.0, compute capability: 3.7
+Traceback (most recent call last):
+  File "cifar10/Regularization/cifar10.py", line 96, in <module>
+    file = open(weights_file, 'w')
+FileNotFoundError: [Errno 2] No such file or directory: 'weights/DenseNet-40-12-CIFAR10-100.h5'
